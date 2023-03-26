@@ -2,7 +2,7 @@ import turtle as t
 import math
 
 screen = t.Screen()
-screen.setup(100, 100)
+screen.setup(500, 500)
 x_min, y_min, x_max, y_max = 0, 0, 100, 100
 screen.setworldcoordinates(x_min, y_min, x_max, y_max)
 screen.colormode(255)
@@ -60,3 +60,6 @@ def drawHatchLines(hatchLineData):
           t.pencolor(color)
           t.goto(intersections[i + 1])
 drawHatchLines(hatchLineData)
+
+screen.exitonclick()
+t.done()
