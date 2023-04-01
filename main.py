@@ -19,14 +19,14 @@ def init():
 init()
 
 vertices = [(50, 20), (70, 30), (80, 50), (70, 70), (50, 30), (30, 70), (20, 50), (30, 30)]
-vertices = []
-while True:
-  x = float(input('x = '))
-  y = float(input('y = '))
-  vertices.append((x, y))
-  addVertex = int(input("add one more vertex? 1: yes 0: no"))
-  if not addVertex:
-    break
+# vertices = []
+# while True:
+#   x = float(input('x = '))
+#   y = float(input('y = '))
+#   vertices.append((x, y))
+#   addVertex = int(input("add one more vertex? 1: yes 0: no"))
+#   if not addVertex:
+#     break
 def drawPolygon(vertices):
   t.penup()
   t.goto(vertices[-1])
@@ -35,7 +35,7 @@ def drawPolygon(vertices):
     t.goto(vertex)
 drawPolygon(vertices)
 
-hatchLineData = {"angle": 45, "spacing": 2, "color": "red"}
+hatchLineData = {"angle": 45, "spacing": 1, "color": (255, 0, 0)}
 def drawHatchLines(hatchLineData):
   [angle, spacing, color] = hatchLineData.values()
   angle = angle * math.pi / 180
