@@ -1,11 +1,11 @@
 import turtle as t
 import math
 
-screen = t.Screen()
-screen.setup(500, 500)
+sc = t.Screen()
+sc.setup(500, 500)
 x_min, y_min, x_max, y_max = 0, 0, 100, 100
-screen.setworldcoordinates(x_min, y_min, x_max, y_max)
-screen.colormode(255)
+sc.setworldcoordinates(x_min, y_min, x_max, y_max)
+sc.colormode(255)
 t.speed(0)
 
 def init():
@@ -19,14 +19,18 @@ def init():
 init()
 
 vertices = [(50, 20), (70, 30), (80, 50), (70, 70), (50, 30), (30, 70), (20, 50), (30, 30)]
-# vertices = []
-# while True:
-#   x = float(input('x = '))
-#   y = float(input('y = '))
-#   vertices.append((x, y))
-#   addVertex = int(input("add one more vertex? 1: yes 0: no"))
-#   if not addVertex:
-#     break
+vertices = []
+inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Interactive input (under dev.)", 1, 1, 1))
+if inputMode == 1:
+  while True:
+    vertexNo = len(vertices) + 1
+    x = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "x = ", minval=0, maxval=100))
+    y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "y = ", minval=0, maxval=100))
+    vertices.append((x, y))
+    if vertexNo >= 3:
+      addVertex = int(sc.numinput("Add another vertex?", "1: Yes\n0: No", minval=0, maxval=1))
+      if not addVertex:
+        break
 def drawPolygon(vertices):
   t.penup()
   t.goto(vertices[-1])
@@ -69,5 +73,5 @@ def drawHatchLines(hatchLineData):
           t.goto(intersections[i + 1])
 drawHatchLines(hatchLineData)
 
-screen.exitonclick()
+sc.exitonclick()
 t.done()
