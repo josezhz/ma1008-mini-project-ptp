@@ -19,18 +19,18 @@ def init():
 init()
 
 vertices = [(50, 20), (70, 30), (80, 50), (70, 70), (50, 30), (30, 70), (20, 50), (30, 30)]
-vertices = []
-inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Interactive input (under dev.)", 1, 1, 1))
-if inputMode == 1:
-  while True:
-    vertexNo = len(vertices) + 1
-    x = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "x = ", minval=0, maxval=100))
-    y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "y = ", minval=0, maxval=100))
-    vertices.append((x, y))
-    if vertexNo >= 3:
-      addVertex = int(sc.numinput("Add another vertex?", "1: Yes\n0: No", minval=0, maxval=1))
-      if not addVertex:
-        break
+# vertices = []
+# inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Interactive input (under dev.)", 1, 1, 1))
+# if inputMode == 1:
+#   while True:
+#     vertexNo = len(vertices) + 1
+#     x = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "x = ", minval=0, maxval=100))
+#     y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + "y = ", minval=0, maxval=100))
+#     vertices.append((x, y))
+#     if vertexNo >= 3:
+#       addVertex = int(sc.numinput("Add another vertex?", "1: Yes\n0: No", minval=0, maxval=1))
+#       if not addVertex:
+#         break
 def drawPolygon(vertices):
   t.penup()
   t.goto(vertices[-1])
@@ -39,7 +39,19 @@ def drawPolygon(vertices):
     t.goto(vertex)
 drawPolygon(vertices)
 
-hatchLineData = {"angle": 45, "spacing": 1, "color": (255, 0, 0)}
+hatchLineData = {"angle": 45, "spacing": 1, "color": "red"}
+def getHatchLineData():
+  angle = float(sc.numinput("Hatch Line Angle", "unit: degree", minval=-89.99999999, maxval=89.99999999))
+  spacing = float(sc.numinput("Hatch Line Spacing", "", minval=0))
+  colorMode = int(sc.numinput("Hatch Line Color Mode", "1: text (eg. red)\n2: RGB (eg. (255, 0, 0))\n3: HEX (eg. #ff0000)"))
+  if colorMode == 2:
+    r = int(sc.numinput("Hatch Line Color", "R =", minval=0, maxval=255))
+    g = int(sc.numinput("Hatch Line Color", "G =", minval=0, maxval=255))
+    b = int(sc.numinput("Hatch Line Color", "B =", minval=0, maxval=255))
+    color = (r, g, b)
+  else:
+    color = sc.textinput("Hatch Line Color", "eg. " + ("red" if colorMode == 1 else "#ff0000"))
+getHatchLineData()
 def drawHatchLines(hatchLineData):
   [angle, spacing, color] = hatchLineData.values()
   angle = angle * math.pi / 180
