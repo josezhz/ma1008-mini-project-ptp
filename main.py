@@ -39,15 +39,13 @@ def checkForIntersections(start, end, existingPolygons, currentPolygon):
     else:
       return False
 
-def getPolygonData():
-  inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Manual input\n3: Interactive input (under dev)", minval=1, maxval=2))
+def getPolygonData(inputMode):
   if inputMode == 1:
     dataFile = open("data.txt", "r")
     lines = dataFile.readlines()
     dataFile.close()
     vertices = [(float(v.split(",")[0]), float(v.split(",")[1])) for v in lines[0].split()]
     holes = [[(float(v.split(",")[0]), float(v.split(",")[1])) for v in h.split()] for h in lines[1].split("|")]
-    return {"vertices": vertices, "holes": holes}
   elif inputMode == 2:
     vertices = []
     errorMessage = ""
@@ -55,10 +53,10 @@ def getPolygonData():
       vertexNo = len(vertices) + 1
       x = float(sc.numinput(f"Vertex No.{vertexNo}", errorMessage + (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"x{vertexNo} = ", minval=0, maxval=100))
       y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"y{vertexNo} = ", minval=0, maxval=100))
-      if vertexNo > 3:
-        if checkForIntersections(vertices[-1], (x, y), [], [[vertices]]):
-          errorMessage = "No intersections between edges allowed\n"
-          continue
+      # if vertexNo > 3:
+      #   if checkForIntersections(vertices[-1], (x, y), [], [[vertices]]):
+      #     errorMessage = "No intersections between edges allowed\n"
+      #     continue
       vertices.append((x, y))
       if vertexNo >= 3:
         addVertex = int(sc.numinput("Add vertex?", "1: Yes\n0: No", minval=0, maxval=1))
@@ -80,19 +78,29 @@ def getPolygonData():
       addHole = int(sc.numinput("Add hole?", "1: Yes\n0: No", minval=0, maxval=1))
       if not addHole:
         break
-    return {"vertices": vertices, "holes": holes}
+  return {"vertices": vertices, "holes": holes}
 
-def getHatchLineData():
-  angle = float(sc.numinput("Hatch Line Angle", "unit: degree", minval=-89.99999999, maxval=89.99999999))
-  spacing = float(sc.numinput("Hatch Line Spacing", "Hatch line spacing =", minval=0))
-  colorMode = int(sc.numinput("Hatch Line Color Mode", "1: text (eg. red)\n2: RGB (eg. (255, 0, 0))\n3: HEX (eg. #ff0000)"))
-  if colorMode == 2:
-    r = int(sc.numinput("Hatch Line Color", "R =", minval=0, maxval=255))
-    g = int(sc.numinput("Hatch Line Color", "G =", minval=0, maxval=255))
-    b = int(sc.numinput("Hatch Line Color", "B =", minval=0, maxval=255))
-    color = (r, g, b)
-  else:
-    color = sc.textinput("Hatch Line Color", "eg. " + ("red" if colorMode == 1 else "#ff0000"))
+def getHatchLineData(inputMode):
+  if inputMode == 1:
+    dataFile = open("data.txt", "r")
+    lines = dataFile.readlines()
+    dataFile.close()
+    dataList = lines[2].split()
+    angle, spacing = float(dataList[0]), float(dataList[1])
+    color = dataList[2]
+    if len(color.split(",")) == 3:
+      color = [int(x) for x in color.split(",")]
+  elif inputMode == 2:
+    angle = float(sc.numinput("Hatch Line Angle", "unit: degree", minval=-89.99999999, maxval=89.99999999))
+    spacing = float(sc.numinput("Hatch Line Spacing", "Hatch line spacing =", minval=0))
+    colorMode = int(sc.numinput("Hatch Line Color Mode", "1: text (eg. red)\n2: RGB (eg. (255, 0, 0))\n3: HEX (eg. #ff0000)"))
+    if colorMode == 2:
+      r = int(sc.numinput("Hatch Line Color", "R =", minval=0, maxval=255))
+      g = int(sc.numinput("Hatch Line Color", "G =", minval=0, maxval=255))
+      b = int(sc.numinput("Hatch Line Color", "B =", minval=0, maxval=255))
+      color = (r, g, b)
+    else:
+      color = sc.textinput("Hatch Line Color", "eg. " + ("red" if colorMode == 1 else "#ff0000"))
   return {"angle": angle, "spacing": spacing, "color": color}
         
 def draw(polygonData, hatchLineData):
@@ -136,14 +144,17 @@ def draw(polygonData, hatchLineData):
         t.pencolor(color)
         t.goto(intersections[i + 1])
 
+def getData():
+  inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Manual input\n3: Interactive input (under dev)", minval=1, maxval=2))
+  return getPolygonData(inputMode), getHatchLineData(inputMode)
+
 init()
 polygonData = {
   "vertices": [(50, 20), (70, 30), (80, 50), (70, 90), (50, 50), (30, 90), (20, 50), (30, 30)],
   "holes": [[(25, 50), (45, 50), (30, 80)], [(30, 40), (70, 40), (50, 25)]]
 }
-polygonData = getPolygonData()
 hatchLineData = {"angle": 30, "spacing": 1, "color": "red"}
-# hatchLineData = getHatchLineData()
+polygonData, hatchLineData = getData()
 draw(polygonData, hatchLineData)
 
 sc.exitonclick()
