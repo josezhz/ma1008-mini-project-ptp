@@ -149,11 +149,6 @@ def getData():
   return getPolygonData(inputMode), getHatchLineData(inputMode)
 
 init()
-polygonData = {
-  "vertices": [(50, 20), (70, 30), (80, 50), (70, 90), (50, 50), (30, 90), (20, 50), (30, 30)],
-  "holes": [[(25, 50), (45, 50), (30, 80)], [(30, 40), (70, 40), (50, 25)]]
-}
-hatchLineData = {"angle": 30, "spacing": 1, "color": "red"}
 polygonData, hatchLineData = getData()
 draw(polygonData, hatchLineData)
 
