@@ -17,34 +17,70 @@ def init():
   t.goto(x_min, y_max)
   t.goto(x_min, y_min)
 
+def checkForIntersections(start, end, existingPolygons, currentPolygon):
+  A1x, A1y = start
+  V1x, V1y = end[0] - start[0], end[1] - start[1]
+  for p in existingPolygons:
+    for i in range(len(p)):
+      nextIndex = i + 1 if i < len(p) - 1 else 0
+      A2x, A2y = p[i]
+      V2x, V2y = (p[nextIndex][0] - p[i][0], p[nextIndex][1] - p[i][2])
+      t1 = ((A2x*V2y - A2y*V2x) - (A1x*V2y - A1y*V2x)) / (V1x*V2y - V1y*V2x) 
+      t2 = ((A2x*V1y - A2y*V1x) - (A1x*V1y - A1y*V1x)) / (V1x*V2y - V1y*V2x)
+      if 0 <= t1 <= 1 and 0 <= t2 <= 1:
+        return True
+  for i in range(len(currentPolygon) - 2):
+    A2x, A2y = p[i]
+    V2x, V2y = (p[i + 1][0] - p[i][0], p[i + 1][1] - p[i][2])
+    t1 = ((A2x*V2y - A2y*V2x) - (A1x*V2y - A1y*V2x)) / (V1x*V2y - V1y*V2x)
+    t2 = ((A2x*V1y - A2y*V1x) - (A1x*V1y - A1y*V1x)) / (V1x*V2y - V1y*V2x)
+    if 0 <= t1 <= 1 and 0 <= t2 <= 1:
+      return True
+    else:
+      return False
+
 def getPolygonData():
-  vertices = []
-  while True:
-    vertexNo = len(vertices) + 1
-    x = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"x{vertexNo} = ", minval=0, maxval=100))
-    y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"y{vertexNo} = ", minval=0, maxval=100))
-    vertices.append((x, y))
-    if vertexNo >= 3:
-      addVertex = int(sc.numinput("Add vertex?", "1: Yes\n0: No", minval=0, maxval=1))
-      if not addVertex:
-        break
-  holes = []
-  while True:
-    holeVertices = []
+  inputMode = int(sc.numinput("Input Mode", "1: File input\n2: Manual input\n3: Interactive input (under dev)", minval=1, maxval=2))
+  if inputMode == 1:
+    dataFile = open("data.txt", "r")
+    lines = dataFile.readlines()
+    dataFile.close()
+    vertices = [(float(v.split(",")[0]), float(v.split(",")[1])) for v in lines[0].split()]
+    holes = [[(float(v.split(",")[0]), float(v.split(",")[1])) for v in h.split()] for h in lines[1].split("|")]
+    return {"vertices": vertices, "holes": holes}
+  elif inputMode == 2:
+    vertices = []
+    errorMessage = ""
     while True:
-      holeVertexNo = len(holeVertices) + 1
-      x = float(sc.numinput(f"Hole Vertex No.{holeVertexNo}", (("Existing hole vertices:\n" + "".join([str(v) + "\n" for v in holeVertices])) if len(holeVertices) else "") + f"x{holeVertexNo} = ", minval=0, maxval=100))
-      y = float(sc.numinput(f"Hole Vertex No.{holeVertexNo}", (("Existing hole vertices:\n" + "".join([str(v) + "\n" for v in holeVertices])) if len(holeVertices) else "") + f"y{holeVertexNo} = ", minval=0, maxval=100))
-      holeVertices.append((x, y))
-      if holeVertexNo >= 3:
-        addHoleVertex = int(sc.numinput("Add hole vertex?", "1: Yes\n0: No", minval=0, maxval=1))
-        if not addHoleVertex:
-          holes.append(holeVertices)
+      vertexNo = len(vertices) + 1
+      x = float(sc.numinput(f"Vertex No.{vertexNo}", errorMessage + (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"x{vertexNo} = ", minval=0, maxval=100))
+      y = float(sc.numinput(f"Vertex No.{vertexNo}", (("Existing vertices:\n" + "".join([str(v) + "\n" for v in vertices])) if len(vertices) else "") + f"y{vertexNo} = ", minval=0, maxval=100))
+      if vertexNo > 3:
+        if checkForIntersections(vertices[-1], (x, y), [], [[vertices]]):
+          errorMessage = "No intersections between edges allowed\n"
+          continue
+      vertices.append((x, y))
+      if vertexNo >= 3:
+        addVertex = int(sc.numinput("Add vertex?", "1: Yes\n0: No", minval=0, maxval=1))
+        if not addVertex:
           break
-    addHole = int(sc.numinput("Add hole?", "1: Yes\n0: No", minval=0, maxval=1))
-    if not addHole:
-      break
-  return {"vertices": vertices, "holes": holes}
+    holes = []
+    while True:
+      holeVertices = []
+      while True:
+        holeVertexNo = len(holeVertices) + 1
+        x = float(sc.numinput(f"Hole Vertex No.{holeVertexNo}", (("Existing hole vertices:\n" + "".join([str(v) + "\n" for v in holeVertices])) if len(holeVertices) else "") + f"x{holeVertexNo} = ", minval=0, maxval=100))
+        y = float(sc.numinput(f"Hole Vertex No.{holeVertexNo}", (("Existing hole vertices:\n" + "".join([str(v) + "\n" for v in holeVertices])) if len(holeVertices) else "") + f"y{holeVertexNo} = ", minval=0, maxval=100))
+        holeVertices.append((x, y))
+        if holeVertexNo >= 3:
+          addHoleVertex = int(sc.numinput("Add hole vertex?", "1: Yes\n0: No", minval=0, maxval=1))
+          if not addHoleVertex:
+            holes.append(holeVertices)
+            break
+      addHole = int(sc.numinput("Add hole?", "1: Yes\n0: No", minval=0, maxval=1))
+      if not addHole:
+        break
+    return {"vertices": vertices, "holes": holes}
 
 def getHatchLineData():
   angle = float(sc.numinput("Hatch Line Angle", "unit: degree", minval=-89.99999999, maxval=89.99999999))
@@ -105,7 +141,7 @@ polygonData = {
   "vertices": [(50, 20), (70, 30), (80, 50), (70, 90), (50, 50), (30, 90), (20, 50), (30, 30)],
   "holes": [[(25, 50), (45, 50), (30, 80)], [(30, 40), (70, 40), (50, 25)]]
 }
-# polygonData = getPolygonData()
+polygonData = getPolygonData()
 hatchLineData = {"angle": 30, "spacing": 1, "color": "red"}
 # hatchLineData = getHatchLineData()
 draw(polygonData, hatchLineData)
