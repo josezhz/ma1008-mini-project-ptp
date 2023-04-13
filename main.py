@@ -104,8 +104,8 @@ def getHatchLineData(inputMode):
   return {"angle": angle, "spacing": spacing, "color": color}
         
 def draw(polygonData, hatchLineData):
+  polygons = [polygonData["vertices"]] + polygonData["holes"]
   # Draw Polygon
-  polygons = [polygonData["vertices"]] + [i for i in polygonData["holes"]]
   for p in polygons:
     t.penup()
     t.goto(p[-1])
